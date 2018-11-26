@@ -4,13 +4,21 @@ import com.mongo.mongo.document.UsersDao;
 import com.mongo.mongo.models.ResponseModel;
 import com.mongo.mongo.models.SuccessResponseModel;
 import com.mongo.mongo.repository.UserRepository;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import static com.mongo.mongo.utils.Constants.ResponseCodes.FAILURE;
-import static com.mongo.mongo.utils.Constants.ResponseCodes.SUCCESS;
+import static com.mongo.mongo.utils.IConstants.responseCodes.FAILURE;
+import static com.mongo.mongo.utils.IConstants.responseCodes.SUCCESS;
 
 @RestController
 @RequestMapping("/rest/users")
@@ -64,5 +72,28 @@ public class UserResource {
             return new SuccessResponseModel(SUCCESS, "Successfully deleted User id: " + pId);
         }
         return new SuccessResponseModel(FAILURE, "Entry not found");
+    }
+
+
+    //post request for uploading file
+    @PostMapping("/upload")
+    public SuccessResponseModel uploadFile(@RequestParam("file") MultipartFile pFile) {
+        System.out.print("dataRecieved==" + pFile.getOriginalFilename());
+
+        try {
+
+            File lTempFile = new File("C:/data/" + pFile.getOriginalFilename());
+            pFile.transferTo(lTempFile);
+            try {
+                Workbook lWorkbook = WorkbookFactory.create(lTempFile);
+            } catch (InvalidFormatException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return new SuccessResponseModel(SUCCESS, "Successfully uploaded!");
     }
 }

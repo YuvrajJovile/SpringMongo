@@ -1,7 +1,9 @@
 package com.mongo.mongo.document;
 
+import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 
@@ -13,6 +15,7 @@ public class UsersDao implements Serializable {
     private String name;
     private String teamname;
     private Double salary;
+
   
 
     public UsersDao() {
@@ -56,4 +59,6 @@ public class UsersDao implements Serializable {
     public void setSalary(Double salary) {
         this.salary = salary;
     }
+
+
 }
