@@ -13,7 +13,7 @@ public class UsersDao implements Serializable {
     private String name;
     private String teamname;
     private Double salary;
-    private Long ids;
+  
 
     public UsersDao() {
     }
