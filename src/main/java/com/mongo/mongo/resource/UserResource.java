@@ -2,6 +2,7 @@ package com.mongo.mongo.resource;
 
 import com.mongo.mongo.document.UsersDao;
 import com.mongo.mongo.models.ResponseModel;
+import com.mongo.mongo.models.SuccessResponseModel;
 import com.mongo.mongo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -49,19 +50,19 @@ public class UserResource {
     }
 
     @PostMapping("/addUser")
-    public ResponseModel addUser(@RequestBody UsersDao pUser) {
+    public SuccessResponseModel addUser(@RequestBody UsersDao pUser) {
         System.out.print("dataRecieved==" + pUser);
         mUserRepository.save(pUser);
-        return new ResponseModel(SUCCESS, "Successfully added User id: " + pUser.getId());
+        return new SuccessResponseModel(SUCCESS, "Successfully added User id: " + pUser.getId());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseModel deleteData(@PathVariable("id") Integer pId) {
+    public SuccessResponseModel deleteData(@PathVariable("id") Integer pId) {
         UsersDao lUsersDao = mUserRepository.findUserById(pId);
         if (lUsersDao != null) {
             mUserRepository.delete(lUsersDao);
-            return new ResponseModel(SUCCESS, "Successfully deleted User id: " + pId);
+            return new SuccessResponseModel(SUCCESS, "Successfully deleted User id: " + pId);
         }
-        return new ResponseModel(FAILURE, "Entry not found");
+        return new SuccessResponseModel(FAILURE, "Entry not found");
     }
 }
