@@ -1,31 +1,32 @@
 package com.mongo.mongo.resource;
 
+import com.mongo.mongo.document.FalseCommsDao;
 import com.mongo.mongo.document.UsersDao;
 import com.mongo.mongo.models.ResponseModel;
 import com.mongo.mongo.models.SuccessResponseModel;
+import com.mongo.mongo.repository.IFalseCommsRepo;
 import com.mongo.mongo.repository.UserRepository;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import com.mongo.mongo.service.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static com.mongo.mongo.utils.IConstants.responseCodes.FAILURE;
 import static com.mongo.mongo.utils.IConstants.responseCodes.SUCCESS;
 
 @RestController
 @RequestMapping("/rest/users")
+@SessionAttributes("name")
 public class UserResource {
 
     @Autowired
     private UserRepository mUserRepository;
+
+    @Autowired
+    private IFalseCommsRepo mFalseCommsRepo;
+
+    @Autowired
+    private FileUploadService mFileUploadService;
 
     @GetMapping("/all")
     public ResponseModel getAll() {
@@ -75,25 +76,43 @@ public class UserResource {
     }
 
 
-    //post request for uploading file
     @PostMapping("/upload")
     public SuccessResponseModel uploadFile(@RequestParam("file") MultipartFile pFile) {
         System.out.print("dataRecieved==" + pFile.getOriginalFilename());
-
         try {
-
-            File lTempFile = new File("C:/data/" + pFile.getOriginalFilename());
-            pFile.transferTo(lTempFile);
-            try {
-                Workbook lWorkbook = WorkbookFactory.create(lTempFile);
-            } catch (InvalidFormatException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
+            if (mFileUploadService.upload(pFile))
+                return new SuccessResponseModel(SUCCESS, "Successfully uploaded!");
+            else
+                return new SuccessResponseModel(FAILURE, "Upload Failure!");
+        } catch (Exception e) {
             e.printStackTrace();
         }
+        return new SuccessResponseModel(FAILURE, "Upload Failure!");
+    }
 
+    @GetMapping("/getUtterance/{id}")
+    public ResponseModel getUtteranceData(@PathVariable("id") Integer pId) {
 
-        return new SuccessResponseModel(SUCCESS, "Successfully uploaded!");
+        FalseCommsDao lFalseCommsDao = mFalseCommsRepo.findDataById(pId);
+        System.out.println("Data==" + lFalseCommsDao);
+        if (lFalseCommsDao != null)
+            return new ResponseModel(SUCCESS, "Success!", lFalseCommsDao);
+        return new ResponseModel(FAILURE, "Error");
+    }
+
+    @PostMapping("/updateUtterance")
+    public ResponseModel updateUtteranceData(@RequestBody FalseCommsDao pFalseCommsDao) {
+
+        FalseCommsDao lFalseCommsDao = mFalseCommsRepo.findDataById(pFalseCommsDao.getId());
+        if (lFalseCommsDao != null) {
+            lFalseCommsDao.setFalseComms(pFalseCommsDao.getFalseComms());
+            lFalseCommsDao.setFalseWake(pFalseCommsDao.getFalseWake());
+            lFalseCommsDao.setBucket(pFalseCommsDao.getBucket());
+            lFalseCommsDao.setComment(pFalseCommsDao.getComment());
+            mFalseCommsRepo.save(lFalseCommsDao);
+            return new ResponseModel(SUCCESS, "Update Success!", lFalseCommsDao);
+        }
+
+        return new ResponseModel(FAILURE, "Update Failure!");
     }
 }

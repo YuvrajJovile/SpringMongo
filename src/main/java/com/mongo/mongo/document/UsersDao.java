@@ -1,38 +1,34 @@
 package com.mongo.mongo.document;
 
-import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 
-@Document
+
+@Document(collection = "user_db")
 public class UsersDao implements Serializable {
 
     @Id
-    private Integer id;
+    private String id;
     private String name;
-    private String teamname;
-    private Double salary;
+    private String userType;
 
-  
 
     public UsersDao() {
     }
 
-    public UsersDao(Integer id, String name, String teamname, Double salary) {
+    public UsersDao(String id, String name, String userType) {
         this.id = id;
         this.name = name;
-        this.teamname = teamname;
-        this.salary = salary;
+        this.userType = userType;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -44,21 +40,11 @@ public class UsersDao implements Serializable {
         this.name = name;
     }
 
-    public String getTeamname() {
-        return teamname;
+    public String getUserType() {
+        return userType;
     }
 
-    public void setTeamname(String teamname) {
-        this.teamname = teamname;
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
-
-    public Double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Double salary) {
-        this.salary = salary;
-    }
-
-
 }
