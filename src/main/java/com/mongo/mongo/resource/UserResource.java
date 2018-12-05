@@ -7,9 +7,28 @@ import com.mongo.mongo.models.SuccessResponseModel;
 import com.mongo.mongo.repository.IFalseCommsRepo;
 import com.mongo.mongo.repository.UserRepository;
 import com.mongo.mongo.service.FileUploadService;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mongo.mongo.utils.IConstants.responseCodes.FAILURE;
 import static com.mongo.mongo.utils.IConstants.responseCodes.SUCCESS;
@@ -115,4 +134,32 @@ public class UserResource {
 
         return new ResponseModel(FAILURE, "Update Failure!");
     }
+
+
+    @GetMapping("/downloadUtterance")
+    public ResponseEntity<Object> downloadUtterance() {
+
+        try {
+
+            File lFile = mFileUploadService.download();
+            InputStreamResource lResource = new InputStreamResource(new FileInputStream(lFile));
+            HttpHeaders lHeaders = new HttpHeaders();
+            lHeaders.add("Content-Disposition", String.format("attachment: filename=\"%s\"", lFile.getName()));
+            lHeaders.add("Cache-Control", "no-cache, no-store, must-revalidate");
+            lHeaders.add("Pragma", "no-cache");
+            lHeaders.add("Expires", "0");
+
+
+            return ResponseEntity.ok().headers(lHeaders)
+                    .contentLength(lFile.length())
+                    .contentType(MediaType.parseMediaType("application/txt")).body(lResource);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<>("Error Occured!", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
 }

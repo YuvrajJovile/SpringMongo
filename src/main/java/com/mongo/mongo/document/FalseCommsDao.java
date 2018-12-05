@@ -15,14 +15,15 @@ public class FalseCommsDao implements Serializable {
     private Integer id;
 
     private Integer count;
-    private String utteranceId;
     private String utteranceType;
+    private String utteranceId;
     private String asr;
     private String translation;
     private Integer falseWake = -1;
     private Integer falseComms = -1;
     private String comment;
     private String bucket;
+    private String userId;
 
 
     public FalseCommsDao() {
@@ -111,5 +112,13 @@ public class FalseCommsDao implements Serializable {
 
     public void setBucket(String bucket) {
         this.bucket = bucket;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }
